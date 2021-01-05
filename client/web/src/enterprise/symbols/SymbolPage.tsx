@@ -11,7 +11,6 @@ import {
     RepositoryExpSymbolResult,
     RepositoryExpSymbolVariables,
     SymbolPageSymbolFields,
-    SymbolPageOtherSymbolFields,
 } from '../../graphql-operations'
 import { RepoRevisionContainerContext } from '../../repo/RepoRevisionContainer'
 import { RouteComponentProps } from 'react-router'
@@ -31,6 +30,8 @@ import { gitCommitFragment } from '../../repo/commits/RepositoryCommitsPage'
 import { GitCommitNode } from '../../repo/commits/GitCommitNode'
 import { FileLocations } from '../../../../branded/src/components/panel/views/FileLocations'
 import { SymbolsSidebarContainerSymbolGQLFragment } from './SymbolsSidebar'
+import { SymbolActions, SymbolActionsGQLFragment } from './SymbolActions'
+import { SymbolStatsSummary } from './SymbolStatsSummary'
 
 const SymbolPageSymbolGQLFragment = gql`
     fragment SymbolPageSymbolFields on ExpSymbol {
@@ -39,6 +40,7 @@ const SymbolPageSymbolGQLFragment = gql`
         kind
         url
         ...SymbolHoverFields
+        ...SymbolActionsFields
         references {
             nodes {
                 range {
@@ -78,6 +80,7 @@ const SymbolPageSymbolGQLFragment = gql`
         }
     }
     ${SymbolHoverGQLFragment}
+    ${SymbolActionsGQLFragment}
     ${gitCommitFragment}
     ${SymbolsSidebarContainerSymbolGQLFragment}
     ${ContainerSymbolsListSymbolGQLFragment}
@@ -216,7 +219,19 @@ export const SymbolPage: React.FunctionComponent<Props> = ({
         <LoadingSpinner className="m-3" />
     ) : (
         <>
-            <SymbolHover {...props} symbol={symbol} history={history} location={location} />
+            <SymbolHover
+                {...props}
+                symbol={symbol}
+                afterSignature={
+                    <div className="d-flex align-items-center mx-3">
+                        <SymbolActions symbol={symbol} />
+                        <SymbolStatsSummary symbol={symbol} className="text-muted ml-3 small" />
+                    </div>
+                }
+                className="mx-3 mt-3"
+                history={history}
+                location={location}
+            />
             {symbol.references.nodes.length > 1 && (
                 <section id="refs" className="mt-2">
                     <h2 className="mt-0 mx-3 mb-0 h4">Examples</h2>
